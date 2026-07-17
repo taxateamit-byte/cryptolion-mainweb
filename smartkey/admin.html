@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Панель Администратора (Просмотр экрана)</title>
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<div class="controls">
+    <h2>🖥 Подключение</h2>
+    <input id="roomInput" type="text" maxlength="4" placeholder="----" inputmode="numeric" autocomplete="off">
+    <button id="connectBtn">Подключиться</button>
+    <div id="statusBadge" class="status-badge">Загрузка...</div>
+    <span class="error-msg" id="errorMsg"></span>
+</div>
+
+<div class="viewer">
+    <img id="screenImage" class="screen-image" alt="Screen stream">
+    <div class="placeholder" id="placeholder">
+        <span class="icon">🖥️</span>
+        <h3>Нет подключения</h3>
+        <p>Введите 4-значный код и нажмите «Подключиться», чтобы увидеть экран удаленного компьютера.</p>
+    </div>
+    <div class="overlay" id="overlay">
+        <span class="dot"></span>
+        <span id="overlayInfo">Подключено</span>
+    </div>    </div>
+
+<script src="js/admin.js"></script>
+</body>
+</html>

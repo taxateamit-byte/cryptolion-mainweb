@@ -1,0 +1,231 @@
+* { box-sizing: border-box; }
+
+body {
+    background: linear-gradient(135deg, #eef2f7 0%, #d9e5f3 100%);
+    color: #1e293b;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Navigation */
+header {
+    width: 100%;
+    padding: 25px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: transparent;
+}
+
+.logo-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 700;
+    font-size: 19px;
+    color: #2563eb;
+}
+
+.logo-img {
+    width: 32px;
+    height: 32px;
+    object-fit: contain;
+}
+
+.status-indicator {
+    font-size: 13px;
+    font-weight: 600;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.status-indicator .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    background: #94a3b8;
+}
+.status-indicator .dot.active { background: #10b981; box-shadow: 0 0 8px rgba(16,185,129,0.4); }
+.status-indicator .dot.inactive { background: #ef4444; }
+
+/* Main layout */
+.container {
+    max-width: 1200px;
+    width: 100%;
+    margin: auto;
+    padding: 20px 40px;
+    display: table;
+}
+.main-layout { display: table-row; }
+
+/* Left panel – connect card */
+.left-panel {
+    display: table-cell;
+    vertical-align: middle;
+    width: 55%;
+    padding-right: 40px;
+    text-align: center;
+}
+
+.connect-box {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 24px;
+    padding: 60px 40px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    display: inline-block;
+    width: 100%;
+    max-width: 500px;
+}
+
+#hostBtn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    padding: 18px 50px;
+    font-size: 18px;
+    font-weight: 600;
+    border-radius: 14px;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+    transition: all 0.25s ease;
+}
+#hostBtn:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(37, 99, 235, 0.35);
+}
+#hostBtn:active { transform: translateY(0); }
+#hostBtn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.ticket-wrapper {
+    margin-top: 35px;
+    padding-top: 25px;
+    border-top: 1px dashed #cbd5e1;
+    display: none;
+}
+.ticket-wrapper.visible { display: block; }
+
+.ticket-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: #64748b;
+    font-weight: 600;
+    margin-bottom: 12px;
+}
+
+#roomCode {
+    font-size: 38px;
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: 5px;
+    margin: 0;
+    background: #ffffff;
+    padding: 12px 25px;
+    border-radius: 12px;
+    display: inline-block;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+    border: 1px solid #e2e8f0;
+}
+
+.timer-text {
+    margin-top: 10px;
+    font-size: 13px;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+/* Right panel – info card */
+.right-panel {
+    display: table-cell;
+    vertical-align: middle;
+    width: 45%;
+}
+
+.info-card {
+    background: #ffffff;
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.05);
+    border: 1px solid #e2e8f0;
+    text-align: left;
+}
+
+.banner-container {
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #f1f5f9;
+    margin-bottom: 20px;
+    line-height: 0;
+}
+.banner-img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.info-card h3 {
+    font-size: 26px;
+    color: #0f172a;
+    margin: 0 0 12px 0;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.info-card p {
+    font-size: 13.5px;
+    color: #64748b;
+    line-height: 1.6;
+    margin: 0 0 20px 0;
+}
+
+.action-card-btn {
+    background: #2563eb;
+    color: white;
+    border: none;
+    width: 100%;
+    padding: 14px 20px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+    transition: all 0.2s ease;
+    text-align: center;
+    display: block;
+    text-decoration: none;
+}
+.action-card-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+}
+
+/* Footer */
+footer {
+    width: 100%;
+    padding: 25px;
+    text-align: center;
+    font-size: 13px;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container { padding: 10px 20px; display: block; }
+    .main-layout { display: block; }
+    .left-panel, .right-panel { display: block; width: 100%; padding: 0; }
+    .left-panel { margin-bottom: 30px; }
+    header { padding: 20px; }
+    .connect-box { padding: 40px 24px; }
+}

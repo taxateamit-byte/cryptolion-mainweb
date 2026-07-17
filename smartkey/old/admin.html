@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Панель Администратора (Просмотр экрана)</title>
+
+    <style>
+        body {
+            background: #0f172a;
+            color: white;
+            font-family: sans-serif;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .controls {
+            background: #1e293b;
+            padding: 20px;
+            border-bottom: 2px solid #334155;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 20px;
+            color: #38bdf8;
+        }
+
+        input {
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 6px;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: white;
+            width: 140px;
+            text-align: center;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        button {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #059669;
+        }
+
+        .status-badge {
+            background: #334155;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            color: #94a3b8;
+            min-width: 180px;
+        }
+
+        .video-container {
+            max-width: 1400px;
+            margin: 20px auto 0 auto;
+            padding: 0 10px;
+        }
+
+        video {
+            width: 100%;
+            background: #000;
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <h2>Подключение к экрану</h2>
+    <input id="roomInput" type="text" maxlength="4" placeholder="КОД">
+    <button id="connectBtn">Подключиться</button>
+    <div id="statusBadge" class="status-badge">Статус: Отключен</div>
+</div>
+
+<div class="video-container">
+    <video id="remoteVideo" autoplay playsinline controls></video>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+    getDatabase,
+    ref,
+    set,
+    push,
+    onValue,
+    onChildAdded,
+    get
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyATuLv77C1q3awiN2fDeckQtCerF-rTc_Q",
+    authDomain: "lionspdf-499b5.firebaseapp.com",
+    databaseURL: "https://lionspdf-499b5-default-rtdb.firebaseio.com",
+    projectId: "lionspdf-499b5",
+    storageBucket: "lionspdf-499b5.firebasestorage.app",
+    messagingSenderId: "63522826506",
+    appId: "1:63522826506:web:45ec1d9412f0aec5a6f2f3"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+const roomInput = document.getElementById("roomInput");
+const connectBtn = document.getElementById("connectBtn");
+const statusBadge = document.getElementById("statusBadge");
+const remoteVideo = document.getElementById("remoteVideo");
+
+const iceServers = {
+    iceServers: [
+        { urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] }
+    ]
+};
+
+let pc = null;
+
+connectBtn.onclick = async () => {
+    const roomId = roomInput.value.trim();
+
+    if (roomId.length !== 4) {
+        alert("Введите корректный 4-значный код комнаты");
+        return;
+    }
+
+    statusBadge.innerText = "Проверка комнаты...";
+    
+    // 1. Проверяем существование самой комнаты в базе данных
+    const roomSnap = await get(ref(db, "rooms/" + roomId));
+    if (!roomSnap.exists()) {
+        alert("Комната не найдена. Убедитесь, что клиент уже запустил трансляцию.");
+        statusBadge.innerText = "Статус: Ошибка кода";
+        return;
+    }
+
+    // 2. Генерируем уникальный идентификатор сессии администратора (как viewerId)
+    const viewerId = Math.random().toString(36).substring(2, 10);
+    
+    // Регистрируем подключение в структуре viewers, чтобы index.html заметил админа
+    await set(ref(db, `rooms/${roomId}/viewers/${viewerId}`), {
+        joined: true
+    });
+
+    statusBadge.innerText = "Ожидание инициализации потока...";
+
+    // 3. Подписываемся на получение WebRTC Offer, создаваемого клиентом под этот viewerId
+    const offerRef = ref(db, `rooms/${roomId}/viewers/${viewerId}/offer`);
+    
+    onValue(offerRef, async (snap) => {
+        const offerData = snap.val();
+        // Ждем, пока клиент сгенерирует полноценный SDP оффер
+        if (!offerData || !offerData.type || !offerData.sdp || pc) return;
+
+        statusBadge.innerText = "Инициализация WebRTC...";
+        pc = new RTCPeerConnection(iceServers);
+
+        // Прием медиапотока от удаленного клиента
+        pc.ontrack = event => {
+            if (event.streams && event.streams[0]) {
+                remoteVideo.srcObject = event.streams[0];
+                statusBadge.innerText = "Статус: Идет трансляция";
+            }
+        };
+
+        // Сбор локальных ICE-кандидатов администратора и запись в Firebase сессии
+        pc.onicecandidate = event => {
+            if (event.candidate) {
+                push(ref(db, `rooms/${roomId}/viewers/${viewerId}/candidates`), event.candidate.toJSON());
+            }
+        };
+
+        // Применяем полученный удаленный оффер
+        await pc.setRemoteDescription(new RTCSessionDescription(offerData));
+
+        // Создаем ответное описание (Answer)
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+
+        // Отправляем ответ в предназначенную для этого viewerId ветку
+        await set(ref(db, `rooms/${roomId}/viewers/${viewerId}/answer`), {
+            type: answer.type,
+            sdp: answer.sdp
+        });
+
+        statusBadge.innerText = "Настройка соединения...";
+
+        // Отслеживаем сетевые кандидаты (hostCandidates), генерируемые клиентом
+        onChildAdded(ref(db, `rooms/${roomId}/viewers/${viewerId}/hostCandidates`), childSnap => {
+            if (childSnap.exists() && pc) {
+                pc.addIceCandidate(new RTCIceCandidate(childSnap.val())).catch(e => console.error(e));
+            }
+        });
+    });
+};
+
+</script>
+
+</body>
+</html>

